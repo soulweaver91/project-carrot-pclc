@@ -411,7 +411,10 @@ int main(int argc, char *argv[]) {
         // First 9 bytes are JCS coordinates on last save, we don't need those
         infoblock.remove(0,9);
 
+        // Not currently saved, as it is not clear where this is used.
         char ambient_min = infoblock.at(0);
+
+        // This, however, is used.
         char ambient_start = infoblock.at(1);
         infoblock.remove(0,2);
 
@@ -733,7 +736,7 @@ int main(int argc, char *argv[]) {
             std::cout << "Music name didn't have an extension .it, .s3m or .mod, added .it automatically.\n";
         }
         inifile.setValue("MusicDefault", music);
-        inifile.setValue("LightInit", ambient_start);
+        inifile.setValue("LightInit", qRound(ambient_start * 100.0 / 64.0));
         inifile.endGroup();
 
             
