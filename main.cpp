@@ -1,7 +1,7 @@
 // J2L to native Project Carrot level file converter
 // Written in 2013 by Soulweaver
 
-#define CONVERTERVERSION "0.5.4"
+#define CONVERTERVERSION "0.5.5"
 #define LAYERFORMATVERSION 5
 #define EVENTSETVERSION 4
 
@@ -28,8 +28,8 @@ struct J2Layer {
     double speed_y;             // covered
     double auto_x;              // covered
     double auto_y;              // covered
-    quint8 tex_type;            // covered by PCLC, not covered by PC itself
-    quint8 tex_param[3];        // covered by PCLC, not covered by PC itself
+    quint8 tex_type;            // covered
+    quint8 tex_param[3];        // covered
 };
 
 struct J2TileEvent {
@@ -536,8 +536,8 @@ int main(int argc, char *argv[]) {
         infoblock.remove(0,8);
         for (unsigned i = 0; i < 8; ++i) {
             layers[i].tex_param[0] = infoblock.at(i*3);
-            layers[i].tex_param[0] = infoblock.at(i*3+1);
-            layers[i].tex_param[0] = infoblock.at(i*3+2);
+            layers[i].tex_param[1] = infoblock.at(i*3+1);
+            layers[i].tex_param[2] = infoblock.at(i*3+2);
         }
         infoblock.remove(0,24);
 

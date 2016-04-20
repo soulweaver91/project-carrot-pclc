@@ -45,5 +45,8 @@
     <None Include="README.md">
       <Filter>Documents</Filter>
     </None>
+    <None Include=".gitignore">
+      <Filter>Documents</Filter>
+    </None>
   </ItemGroup>
 </Project>
