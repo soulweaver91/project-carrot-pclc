@@ -1,9 +1,9 @@
 // J2L to native Project Carrot level file converter
 // Written in 2013 by Soulweaver
 
-#define CONVERTERVERSION "0.5.5"
+#define CONVERTERVERSION "0.5.7"
 #define LAYERFORMATVERSION 5
-#define EVENTSETVERSION 4
+#define EVENTSETVERSION 5
 
 #include <QDataStream>
 #include <QDir>
@@ -117,7 +117,7 @@ QByteArray BEfromLE(QByteArray le) {
     return be;
 }
 
-bool convertParams(quint8 event_type, quint32 old_params, QList< quint16 >& result) {
+bool convertParams(quint8 event_type, quint16& newType, quint32 old_params, QList< quint16 >& result) {
     // 8 parameter slots per event
     for (unsigned i = 0; i < 8; ++i) {
         result << 0;
@@ -158,7 +158,12 @@ bool convertParams(quint8 event_type, quint32 old_params, QList< quint16 >& resu
             result[2] = (old_params >> 7)  % 16;  // Toughness
             return true;
         case JJ2_SCENERY_DESTRUCT:
-            result[0] = (old_params >> 15) % 16; // Weapon
+            if ((old_params >> 10) % 32 > 0) {
+                newType = (quint16)PC_SCENERY_DESTRUCT_SPD;
+                result[0] = (old_params >> 10) % 32; // Weapon
+            } else {
+                result[0] = (old_params >> 15) % 16; // Weapon
+            }
             return true;
         case JJ2_SPRING_RED:
         case JJ2_SPRING_GREEN:
@@ -271,7 +276,7 @@ void writeEventLayout(const QString& target, const QList< J2Layer >& layers, con
             quint8 flags = event_table.at(idx).illuminate +
                           (event_table.at(idx).difficulty * 2);
             QList< quint16 > params;
-            convertParams(event_table.at(idx).event_type,event_table.at(idx).params, params);
+            convertParams(event_table.at(idx).event_type, type, event_table.at(idx).params, params);
             outstr << type << flags;
             for (int i = 0; i < 8; ++i) {
                 outstr << params.at(i);

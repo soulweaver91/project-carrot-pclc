@@ -379,6 +379,7 @@ void EventIDConverter::init() {
     assigned.insert(JJ2_FOOD_HOT_DOG, PC_FOOD_HOT_DOG);
     assigned.insert(JJ2_FOOD_HAM, PC_FOOD_HAM);
     assigned.insert(JJ2_FOOD_CHEESE, PC_FOOD_CHEESE);
+    assigned.insert(JJ2_SCENERY_COLLAPSE, PC_SCENERY_COLLAPSE);
 }
 
 QMap< JJ2Event, PCEvent > EventIDConverter::assigned = QMap< JJ2Event, PCEvent >();
