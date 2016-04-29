@@ -220,6 +220,10 @@ bool convertParams(quint8 event_type, quint16& newType, quint32 old_params, QLis
             result[2] = (old_params >> 17) % 8;   // Wait Time
             result[7] = (old_params >> 14) % 8;   // Trig Sample (unknown)
             return true;
+        case JJ2_SCENERY_COLLAPSE:
+            result[0] = (old_params      ) % 1024; // Wait Time
+            result[1] = (old_params >> 10) % 32;   // FPS
+            return true;
         default:
             return false;
     }
