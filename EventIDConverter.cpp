@@ -382,6 +382,7 @@ void EventIDConverter::init() {
     assigned.insert(JJ2_SCENERY_COLLAPSE, PC_SCENERY_COLLAPSE);
     assigned.insert(JJ2_CARROT, PC_CARROT);
     assigned.insert(JJ2_TURTLE_SHELL, PC_TURTLE_SHELL);
+    assigned.insert(JJ2_CARROT_FULL, PC_CARROT_FULL);
 }
 
 QMap< JJ2Event, PCEvent > EventIDConverter::assigned = QMap< JJ2Event, PCEvent >();
