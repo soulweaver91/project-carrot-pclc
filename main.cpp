@@ -1,9 +1,9 @@
 // J2L to native Project Carrot level file converter
 // Written in 2013 by Soulweaver
 
-#define CONVERTERVERSION "0.5.7"
+#define CONVERTERVERSION "0.5.8"
 #define LAYERFORMATVERSION 5
-#define EVENTSETVERSION 5
+#define EVENTSETVERSION 6
 
 #include <QDataStream>
 #include <QDir>
