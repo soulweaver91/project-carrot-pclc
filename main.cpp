@@ -1,9 +1,9 @@
 // J2L to native Project Carrot level file converter
 // Written in 2013 by Soulweaver
 
-#define CONVERTERVERSION "0.5.8"
+#define CONVERTERVERSION "0.5.9"
 #define LAYERFORMATVERSION 5
-#define EVENTSETVERSION 6
+#define EVENTSETVERSION 7
 
 #include <QDataStream>
 #include <QDir>
@@ -125,10 +125,15 @@ bool convertParams(quint8 event_type, quint16& newType, quint32 old_params, QLis
     // Converts parameters to Project Carrot format, removing unused ones if necessary and adding new defaults when applicable
     switch(event_type) {
         case JJ2_WARP_ORIGIN:
+            quint16 coins = (old_params >> 8) % 256;
+
+            if (coins > 0) {
+                newType = (quint16)PC_WARP_COIN_BONUS;
+                result[3] = coins;
+            }
             result[0] =  old_params        % 256;  // Warp ID
-            result[1] = (old_params >> 8)  % 256;  // Coins
-            result[2] = (old_params >> 16) % 2;    // Set Lap
-            result[3] = (old_params >> 17) % 2;    // Show Anim
+            result[1] = (old_params >> 16) % 2;    // Set Lap
+            result[2] = (old_params >> 17) % 2;    // Show Anim
             return true;
         case JJ2_WARP_TARGET:
             result[0] =  old_params        % 256;  // Warp ID
