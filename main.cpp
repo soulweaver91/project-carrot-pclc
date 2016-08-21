@@ -125,12 +125,15 @@ bool convertParams(quint8 event_type, quint16& newType, quint32 old_params, QLis
     // Converts parameters to Project Carrot format, removing unused ones if necessary and adding new defaults when applicable
     switch(event_type) {
         case JJ2_WARP_ORIGIN:
-            quint16 coins = (old_params >> 8) % 256;
+            {
+                quint16 coins = (old_params >> 8) % 256;
 
-            if (coins > 0) {
-                newType = (quint16)PC_WARP_COIN_BONUS;
-                result[3] = coins;
+                if (coins > 0) {
+                    newType = (quint16)PC_WARP_COIN_BONUS;
+                    result[3] = coins;
+                }
             }
+
             result[0] =  old_params        % 256;  // Warp ID
             result[1] = (old_params >> 16) % 2;    // Set Lap
             result[2] = (old_params >> 17) % 2;    // Show Anim
