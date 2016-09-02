@@ -393,6 +393,7 @@ void EventIDConverter::init() {
     assigned.insert(JJ2_POWERUP_TOASTER, PC_POWERUP_TOASTER);
     assigned.insert(JJ2_POWERUP_PEPPER, PC_POWERUP_PEPPER);
     assigned.insert(JJ2_POWERUP_ELECTRO, PC_POWERUP_ELECTRO);
+    assigned.insert(JJ2_ENEMY_LAB_RAT, PC_ENEMY_LAB_RAT);
 }
 
 QMap< JJ2Event, PCEvent > EventIDConverter::assigned = QMap< JJ2Event, PCEvent >();
