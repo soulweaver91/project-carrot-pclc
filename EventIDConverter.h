@@ -275,7 +275,6 @@ enum JJ2Event {                             // Parameters
 
 };
 
-// as of 15.7.13 1:45
 enum PCEvent {
     PC_EMPTY                = 0x0000,
     PC_FAST_FIRE            = 0x0001,
@@ -287,15 +286,15 @@ enum PCEvent {
     PC_AMMO_TNT             = 0x0007,
     PC_AMMO_PEPPER          = 0x0008,
     PC_AMMO_ELECTRO         = 0x0009,
-    PC_POWERUP_BLASTER      = 0x0011, // not implemented
-    PC_POWERUP_BOUNCER      = 0x0012, // not implemented
-    PC_POWERUP_FREEZER      = 0x0013, // not implemented
-    PC_POWERUP_SEEKER       = 0x0014, // not implemented
-    PC_POWERUP_RF           = 0x0015, // not implemented
-    PC_POWERUP_TOASTER      = 0x0016, // not implemented
-    PC_POWERUP_TNT          = 0x0017, // not implemented
-    PC_POWERUP_PEPPER       = 0x0018, // not implemented
-    PC_POWERUP_ELECTRO      = 0x0019, // not implemented
+    PC_POWERUP_BLASTER      = 0x0011,
+    PC_POWERUP_BOUNCER      = 0x0012,
+    PC_POWERUP_FREEZER      = 0x0013,
+    PC_POWERUP_SEEKER       = 0x0014,
+    PC_POWERUP_RF           = 0x0015,
+    PC_POWERUP_TOASTER      = 0x0016,
+    PC_POWERUP_TNT          = 0x0017,
+    PC_POWERUP_PEPPER       = 0x0018,
+    PC_POWERUP_ELECTRO      = 0x0019,
     PC_GEM_RED              = 0x0040,
     PC_GEM_GREEN            = 0x0041,
     PC_GEM_BLUE             = 0x0042,

@@ -385,6 +385,14 @@ void EventIDConverter::init() {
     assigned.insert(JJ2_CARROT_FULL, PC_CARROT_FULL);
     assigned.insert(JJ2_ENEMY_SUCKER_FLOAT, PC_ENEMY_SUCKER_FLOAT);
     assigned.insert(JJ2_ENEMY_SUCKER, PC_ENEMY_SUCKER);
+    assigned.insert(JJ2_POWERUP_BLASTER, PC_POWERUP_BLASTER);
+    assigned.insert(JJ2_POWERUP_BOUNCER, PC_POWERUP_BOUNCER);
+    assigned.insert(JJ2_POWERUP_FREEZER, PC_POWERUP_FREEZER);
+    assigned.insert(JJ2_POWERUP_SEEKER, PC_POWERUP_SEEKER);
+    assigned.insert(JJ2_POWERUP_RF, PC_POWERUP_RF);
+    assigned.insert(JJ2_POWERUP_TOASTER, PC_POWERUP_TOASTER);
+    assigned.insert(JJ2_POWERUP_PEPPER, PC_POWERUP_PEPPER);
+    assigned.insert(JJ2_POWERUP_ELECTRO, PC_POWERUP_ELECTRO);
 }
 
 QMap< JJ2Event, PCEvent > EventIDConverter::assigned = QMap< JJ2Event, PCEvent >();
