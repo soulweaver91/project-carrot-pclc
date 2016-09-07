@@ -210,7 +210,7 @@ enum JJ2Event {                             // Parameters
     JJ2_POLE_PSYCH                  = 0xCC, // Adjust Y: 5u, Adjust X: 6s
     JJ2_POLE_DIAMONDUS              = 0xCD, // Adjust Y: 5u, Adjust X: 6s
     JJ2_MODIFIER_TUBE               = 0xCE, // X Speed: 7s, Y Speed: 7s, Trig Sample (unknown) 3u, Wait Time: 3u
-    JJ2_TEXT                        = 0xCF, // Text: 8u, Vanish: bool
+    JJ2_AREA_TEXT                   = 0xCF, // Text: 8u, Vanish: bool
     JJ2_MODIFIER_SET_WATER          = 0xD0, // Height: 8u, Instant: bool
     JJ2_PLATFORM_FRUIT              = 0xD1, // Sync: 2u, Speed: 6s, Length: 4u, Swing: bool
     JJ2_PLATFORM_BOLL               = 0xD2, // Sync: 2u, Speed: 6s, Length: 4u, Swing: bool
@@ -379,6 +379,7 @@ enum PCEvent {
     PC_ENEMY_LAB_RAT        = 0x018B,
     PC_LIGHT_STEADY         = 0x0121,
     PC_LIGHT_PULSE          = 0x0122,
+    PC_AREA_TEXT            = 0x014A,
 };
 
 

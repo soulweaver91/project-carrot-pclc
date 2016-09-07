@@ -397,6 +397,7 @@ void EventIDConverter::init() {
     assigned.insert(JJ2_LIGHT_DIM, PC_LIGHT_STEADY);
     assigned.insert(JJ2_LIGHT_STEADY, PC_LIGHT_STEADY);
     assigned.insert(JJ2_LIGHT_PULSE, PC_LIGHT_PULSE);
+    assigned.insert(JJ2_AREA_TEXT, PC_AREA_TEXT);
 }
 
 QMap< JJ2Event, PCEvent > EventIDConverter::assigned = QMap< JJ2Event, PCEvent >();

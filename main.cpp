@@ -1,9 +1,9 @@
 // J2L to native Project Carrot level file converter
 // Written in 2013 by Soulweaver
 
-#define CONVERTERVERSION "0.5.12"
+#define CONVERTERVERSION "0.5.13"
 #define LAYERFORMATVERSION 5
-#define EVENTSETVERSION 10
+#define EVENTSETVERSION 11
 
 #include <QDataStream>
 #include <QDir>
@@ -242,6 +242,10 @@ bool convertParams(quint8 event_type, quint16& newType, quint32 old_params, QLis
             return true;
         case JJ2_LIGHT_DIM:
             result[0] = 127; // Alpha
+            return true;
+        case JJ2_AREA_TEXT:
+            result[0] = (old_params      ) % 256;  // Text
+            result[1] = (old_params >> 8 ) % 2;    // Vanish
             return true;
         default:
             return false;
