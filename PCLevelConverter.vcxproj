@@ -140,11 +140,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="EventIDConverter.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\EventIDConverter.cpp" />
+    <ClCompile Include="src\Jazz2Level.cpp" />
+    <ClCompile Include="src\Jazz2FormatDataBlock.cpp" />
+    <ClCompile Include="src\Jazz2FormatParseException.cpp" />
+    <ClCompile Include="src\PCLevelConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EventIDConverter.h" />
+    <ClInclude Include="src\EventIDConverter.h" />
+    <ClInclude Include="src\Jazz2Level.h" />
+    <ClInclude Include="src\Jazz2FormatDataBlock.h" />
+    <ClInclude Include="src\Jazz2FormatParseException.h" />
+    <ClInclude Include="src\PCLevelConverter.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="LICENSE" />
