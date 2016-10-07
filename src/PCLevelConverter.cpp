@@ -13,145 +13,10 @@
 #include <QSettings>
 #include <iostream>
 #include "PCLevelConverter.h"
-#include "EventIDConverter.h"
+#include "EventConverter.h"
 
 #include "Jazz2Level.h"
 #include "Jazz2FormatParseException.h"
-
-bool convertParams(quint8 event_type, quint16& newType, quint32 old_params, QList< quint16 >& result) {
-    // 8 parameter slots per event
-    for (unsigned i = 0; i < 8; ++i) {
-        result << 0;
-    }
-    // Converts parameters to Project Carrot format, removing unused ones if necessary and adding new defaults when applicable
-    switch(event_type) {
-        case JJ2_WARP_ORIGIN:
-            {
-                quint16 coins = (old_params >> 8) % 256;
-
-                if (coins > 0) {
-                    newType = (quint16)PC_WARP_COIN_BONUS;
-                    result[3] = coins;
-                }
-            }
-
-            result[0] =  old_params        % 256;  // Warp ID
-            result[1] = (old_params >> 16) % 2;    // Set Lap
-            result[2] = (old_params >> 17) % 2;    // Show Anim
-            return true;
-        case JJ2_WARP_TARGET:
-            result[0] =  old_params        % 256;  // Warp ID
-            return true;
-        case JJ2_TRIGGER_AREA:
-            result[0] =  old_params        % 32;   // Trigger ID
-            return true;
-        case JJ2_TRIGGER_CRATE:
-            result[0] =  old_params        % 32;   // Trigger ID
-            return true;
-        case JJ2_LIGHT_SET:
-            result[0] =  old_params        % 128;  // Intensity
-            result[1] = (old_params >> 7)  % 16;   // Red
-            result[2] = (old_params >> 11) % 16;   // Green
-            result[3] = (old_params >> 15) % 16;   // Blue
-            result[4] = (old_params >> 16) % 2;    // Flicker
-            return true;
-        case JJ2_PUSHABLE_BOX:
-            result[0] = 1; // Solid Object, type 1
-            return true;
-        case JJ2_PUSHABLE_ROCK:
-            result[0] = 0; // Solid Object, type 0
-            return true;
-        case JJ2_BRIDGE:
-            result[0] =  old_params        % 16 * 2;  // Width
-            result[1] = (old_params >> 4)  % 8;   // Type
-            result[2] = (old_params >> 7)  % 16;  // Toughness
-            return true;
-        case JJ2_SCENERY_DESTRUCT:
-            if ((old_params >> 10) % 32 > 0) {
-                newType = (quint16)PC_SCENERY_DESTRUCT_SPD;
-                result[0] = (old_params >> 10) % 32; // Weapon
-            } else {
-                result[0] = (old_params >> 15) % 16; // Weapon
-            }
-            return true;
-        case JJ2_SPRING_RED:
-        case JJ2_SPRING_GREEN:
-        case JJ2_SPRING_BLUE:
-            result[0] =  old_params        % 2 * 2;  // Orientation
-            result[1] = (old_params >> 1)  % 2;  // Keep Xspeed
-            result[2] = (old_params >> 2)  % 2;  // Keey Yspeed
-            result[3] = (old_params >> 3)  % 16; // Delay
-            return true;
-        case JJ2_SPRING_RED_HOR:
-        case JJ2_SPRING_GREEN_HOR:
-        case JJ2_SPRING_BLUE_HOR:
-            result[0] = 5;  // Orientation
-            result[1] = (old_params >> 1)  % 2;  // Keep Xspeed
-            result[2] = (old_params >> 2)  % 2;  // Keey Yspeed
-            result[3] = (old_params >> 3)  % 16; // Delay
-            return true;
-        case JJ2_PLATFORM_BOLL:
-        case JJ2_PLATFORM_FRUIT:
-        case JJ2_PLATFORM_GRASS:
-        case JJ2_PLATFORM_PINK:
-        case JJ2_PLATFORM_SONIC:
-        case JJ2_PLATFORM_SPIKE:
-            result[0] = (event_type - JJ2_PLATFORM_FRUIT + 1);  // Type
-            result[1] =  old_params        % 4;  // Sync
-
-            {
-                qint16 speed = (old_params >> 2) % 64;
-                if (speed > 31) {
-                    speed = -32 + (speed - 32);
-                }
-
-                result[2] = (quint16)speed; // Speed
-            }
-
-            result[3] = (old_params >> 8)  % 16; // Length
-            result[4] = (old_params >> 12) % 2;  // Swing
-            return true;
-        case JJ2_MODIFIER_TUBE:
-            {
-                qint16 speed = (old_params) % 64;
-                if (speed > 31) {
-                    speed = -32 + (speed - 32);
-                }
-                result[0] = (quint16)speed; // X Speed
-
-                speed = (old_params >> 7) % 64;
-                if (speed > 31) {
-                    speed = -32 + (speed - 32);
-                }
-                result[1] = (quint16)speed; // Y Speed
-            }
-
-            result[2] = (old_params >> 17) % 8;   // Wait Time
-            result[7] = (old_params >> 14) % 8;   // Trig Sample (unknown)
-            return true;
-        case JJ2_SCENERY_COLLAPSE:
-            result[0] = (old_params      ) % 1024; // Wait Time
-            result[1] = (old_params >> 10) % 32;   // FPS
-            return true;
-        case JJ2_LIGHT_PULSE:
-            result[0] = 0;                       // Alpha
-            result[1] = (old_params)      % 256; // Speed
-            result[2] = (old_params >> 8) % 16;  // Sync
-            return true;
-        case JJ2_LIGHT_STEADY:
-            result[0] = 0; // Alpha
-            return true;
-        case JJ2_LIGHT_DIM:
-            result[0] = 127; // Alpha
-            return true;
-        case JJ2_AREA_TEXT:
-            result[0] = (old_params      ) % 256;  // Text
-            result[1] = (old_params >> 8 ) % 2;    // Vanish
-            return true;
-        default:
-            return false;
-    }
-}
 
 void writeLayout(const QString& target, const Jazz2Layer& layer,
                  const QString& file_descriptive, uint flipbyte, uint last_tile = 0xFFFFFFFF) {
@@ -201,14 +66,13 @@ void writeEventLayout(const QString& target, const Jazz2Layer& layer,
     for (int y = 0; y < layer.height; ++y) {
         for (int x = 0; x < layer.width; ++x) {
             int idx = y * layer.width + x;
-            quint16 type = layer.tiles.at(y).at(x);
             quint8 flags = event_table.at(idx).illuminate +
                           (event_table.at(idx).difficulty * 2);
-            QList< quint16 > params;
-            convertParams(event_table.at(idx).event_type, type, event_table.at(idx).params, params);
+            auto converted = EventConverter::convert(event_table.at(idx).event_type, event_table.at(idx).params);
+            quint16 type = converted.event;
             outstr << type << flags;
             for (int i = 0; i < 8; ++i) {
-                outstr << params.at(i);
+                outstr << converted.parameters.at(i);
             }
         }
         outstr << (quint16)(0xFFFF);
@@ -353,7 +217,7 @@ void PCLevelConverter::convert(const QString& filename, const QString& id, const
     for (unsigned y = 0; y < level->layers.at(3).height; ++y) {
         QList< quint16 > new_row;
         for (unsigned x = 0; x < level->layers.at(3).width; ++x) {
-            new_row.push_back(EventIDConverter::convert(level->events.at(y * level->layers.at(3).width + x).event_type));
+            new_row.push_back(level->events.at(y * level->layers.at(3).width + x).event_type);
         }
         level->layers[3].tiles.push_back(new_row);
     }
