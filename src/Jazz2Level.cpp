@@ -1,11 +1,13 @@
 #include "Jazz2Level.h"
 
-#include "Jazz2FormatParseException.h"
-
 #include <QFile>
 #include <QDataStream>
 #include <QByteArray>
 #include <exception>
+
+#include "Jazz2FormatParseException.h"
+#include "EventConverter.h"
+#include "Version.h"
 
 Jazz2Level::Jazz2Level() {
 }
@@ -13,11 +15,11 @@ Jazz2Level::Jazz2Level() {
 Jazz2Level* Jazz2Level::fromFile(const QString& filename, bool strictParser) {
     QFile fh(filename);
     if (!(fh.exists())) {
-        throw Jazz2FormatParseException(FILE_NOT_FOUND);
+        throw Jazz2FormatParseException(FILE_NOT_FOUND, { filename });
     }
 
     if (!(fh.open(QIODevice::ReadOnly))) {
-        throw Jazz2FormatParseException(FILE_CANNOT_BE_OPENED);
+        throw Jazz2FormatParseException(FILE_CANNOT_BE_OPENED, { filename });
     }
 
     Jazz2FormatDataBlock headerBlock(fh.read(262), false, 262);
@@ -49,6 +51,25 @@ Jazz2Level* Jazz2Level::fromFile(const QString& filename, bool strictParser) {
     level->loadLayers(dictBlock, dictBlockUnpackedSize / 8, layoutBlock, strictParser);
 
     return level;
+}
+
+void Jazz2Level::saveAsProjectCarrotLevel(const QDir& directory, const QString& uniqueID) {
+    const QString absoluteDir = directory.absolutePath();
+
+    writePCConfigFile(absoluteDir + "/config.ini", uniqueID);
+
+    writePCLayer(absoluteDir + "/spr.layer", layers[3]);
+    writePCLayer(absoluteDir + "/sky.layer", layers[7]);
+    for (unsigned i = 0; i < 3; ++i) {
+        writePCLayer(absoluteDir + "/" + QString::number(2 - i) + ".fg.layer", layers[i]);
+    }
+    for (unsigned i = 4; i < 7; ++i) {
+        writePCLayer(absoluteDir + "/" + QString::number(6 - i) + ".bg.layer", layers[i]);
+    }
+
+    writePCEvents(absoluteDir + "/event.layer", layers[3].width, layers[3].height);
+
+    writePCAnimatedTiles(absoluteDir + "/animtiles.dat");
 }
 
 void Jazz2Level::printData(std::ostream& target) {
@@ -358,6 +379,182 @@ void Jazz2Level::loadLayers(Jazz2FormatDataBlock& dictBlock, quint32 dictLength,
 
         }
     }
+}
+
+void Jazz2Level::writePCConfigFile(const QString& filename, const QString& uniqueID) {
+    QSettings file(filename, QSettings::IniFormat);
+    if (!file.isWritable()) {
+        throw Jazz2FormatParseException(FILE_CANNOT_BE_OPENED, { filename });
+    }
+
+    file.beginGroup("Version");
+    file.setValue("WritingApp", "PCLC-" + QString(CONVERTERVERSION));
+    file.setValue("LayerFormat", LAYERFORMATVERSION);
+    file.setValue("EventSet", EVENTSETVERSION);
+    file.endGroup();
+
+    file.beginGroup("Level");
+    file.setValue("LevelToken", uniqueID);
+    file.setValue("FormalName", name);
+    file.setValue("Next", nextLevel);
+
+    if (tileset.endsWith(".j2t", Qt::CaseInsensitive)) {
+        tileset.chop(4);
+        std::cout << "Found a .j2t extension in the tileset name, removed it automatically.\n";
+    }
+    file.setValue("Tileset", tileset);
+    if (!(music.endsWith(".it", Qt::CaseInsensitive)
+       || music.endsWith(".s3m", Qt::CaseInsensitive)
+       || music.endsWith(".mod", Qt::CaseInsensitive))) {
+        music.append(".it");
+        std::cout << "Music name didn't have an extension .it, .s3m or .mod, added .it automatically.\n";
+    }
+    file.setValue("MusicDefault", music);
+    file.setValue("LightInit", qRound(lightingStart * 100.0 / 64.0));
+    file.endGroup();
+
+    file.beginGroup("TextEvent");
+    for (unsigned i = 0; i < 16; ++i) {
+        file.setValue("Str" + QString::number(i), textEventStrings.at(i));
+    }
+    file.endGroup();
+
+    writePCConfigFileLayerSection(file, "sky.layer", layers[7], true);
+    for (unsigned i = 0; i < 3; ++i) {
+        writePCConfigFileLayerSection(file, QString::number(2 - i) + ".fg.layer", layers[i], false);
+    }
+    for (unsigned i = 4; i < 7; ++i) {
+        writePCConfigFileLayerSection(file, QString::number(6 - i) + ".bg.layer", layers[i], false);
+    }
+
+    file.sync();
+}
+
+void Jazz2Level::writePCConfigFileLayerSection(QSettings& file, const QString& sectionName, const Jazz2Layer& layer, bool addBackgroundFields) {
+    if (!layer.used) {
+        return;
+    }
+
+    file.beginGroup(sectionName);
+    file.setValue("XSpeed",          layer.speed_x);
+    file.setValue("YSpeed",          layer.speed_y);
+    file.setValue("XAutoSpeed",      layer.auto_x);
+    file.setValue("YAutoSpeed",      layer.auto_y);
+    file.setValue("XRepeat",        (layer.flags & 0x00000001) > 0);
+    file.setValue("YRepeat",        (layer.flags & 0x00000002) > 0);
+    file.setValue("J2L.Depth",       layer.depth);
+    file.setValue("J2L.DetailLevel", layer.detail_level);
+    file.setValue("InherentOffset", (layer.flags & 0x00000004) > 0); // "Limit Visible Region"
+
+    if (addBackgroundFields) {
+        file.setValue("TexturedMode", layer.tex_type);
+        file.setValue("TexturedModeColor", '#'
+                      + QString::number(layer.tex_param[0], 16).rightJustified(2, '0')
+                      + QString::number(layer.tex_param[1], 16).rightJustified(2, '0')
+                      + QString::number(layer.tex_param[2], 16).rightJustified(2, '0'));
+        file.setValue("TexturedModeEnabled",  (layer.flags & 0x00000008) > 0);
+        file.setValue("ParallaxStarsEnabled", (layer.flags & 0x00000010) > 0);
+    }
+
+    file.endGroup();
+}
+
+void Jazz2Level::writePCLayer(const QString& filename, const Jazz2Layer& layer) {
+    if (!layer.used) {
+        return;
+    }
+
+    QFile file(filename);
+    if (!(file.open(QIODevice::WriteOnly))) {
+        throw Jazz2FormatParseException(FILE_CANNOT_BE_OPENED, { filename });
+    }
+
+    auto maxTiles = maxSupportedTiles();
+    qint16 lastTilesetTileIndex = maxTiles - animCount;
+
+    QByteArray outputBuffer;
+    QDataStream outputStream(&outputBuffer, QIODevice::WriteOnly);
+    for (int y = 0; y < layer.height; ++y) {
+        for (int x = 0; x < layer.width; ++x) {
+            quint16 tileIdx = layer.tiles.at(y).at(x);
+
+            bool flipX = false;
+            bool flipY = false;
+
+            // Max. tiles is either 0x0400 or 0x1000 and doubles as a mask to separate flipped tiles.
+            // In J2L, each flipped tile had a separate entry in the tile list, probably to make
+            // the dictionary concept easier to handle.
+            if ((tileIdx & maxTiles) > 0) {
+                flipX = true;
+                tileIdx -= maxTiles;
+            }
+
+            bool animated = false;
+            if (tileIdx >= lastTilesetTileIndex) {
+                animated = true;
+                tileIdx -= lastTilesetTileIndex;
+            }
+
+            quint8 tile_flags = (flipX ? 0x01 : 0) + (flipY ? 0x02 : 0) + (animated ? 0x04 : 0);
+            outputStream << tileIdx << tile_flags;
+        }
+        outputStream << (quint16)(0xFFFF);
+    }
+
+    file.write(qCompress(outputBuffer));
+    file.close();
+}
+
+void Jazz2Level::writePCEvents(const QString& filename, quint32 width, quint32 height) {
+    QFile file(filename);
+    if (!(file.open(QIODevice::WriteOnly))) {
+        throw Jazz2FormatParseException(FILE_CANNOT_BE_OPENED, { filename });
+    }
+
+    QByteArray outputBuffer;
+    QDataStream outputStream(&outputBuffer, QIODevice::WriteOnly);
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            auto& event = events.at(y * width + x);
+
+            quint8 flags = event.illuminate + (event.difficulty * 2);
+            auto converted = EventConverter::convert(event.event_type, event.params);
+
+            outputStream << (quint16)converted.event << flags;
+            for (int i = 0; i < 8; ++i) {
+                outputStream << converted.parameters.at(i);
+            }
+        }
+        outputStream << (quint16)(0xFFFF);
+    }
+
+    file.write(qCompress(outputBuffer));
+    file.close();
+}
+
+void Jazz2Level::writePCAnimatedTiles(const QString& filename) {
+    QFile file(filename);
+    if (!(file.open(QIODevice::WriteOnly))) {
+        throw Jazz2FormatParseException(FILE_CANNOT_BE_OPENED, { filename });
+    }
+
+    QByteArray outputBuffer;
+    QDataStream outputStream(&outputBuffer, QIODevice::WriteOnly);
+
+    for (Jazz2AniTile tile : animatedTiles) {
+        for (int i = 0; i < 64; ++i) {
+            if (i >= tile.frame_cnt) {
+                outputStream << (quint16)(0xFFFF);
+            } else {
+                outputStream << tile.frames[i];
+            }
+        }
+        quint8 reverse = tile.is_reverse ? 1 : 0;
+        outputStream << tile.speed << tile.delay << tile.delay_jitter << reverse << tile.reverse_delay;
+    }
+
+    file.write(qCompress(outputBuffer));
+    file.close();
 }
 
 int Jazz2Level::maxSupportedTiles() {

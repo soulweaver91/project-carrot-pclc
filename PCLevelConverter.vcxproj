@@ -154,6 +154,7 @@
     <ClInclude Include="src\JJ2Event.h" />
     <ClInclude Include="src\PCEvent.h" />
     <ClInclude Include="src\PCLevelConverter.h" />
+    <ClInclude Include="src\Version.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="LICENSE" />

@@ -16,10 +16,10 @@ const QVector<QVariant> Jazz2FormatParseException::getInfo() {
 QString Jazz2FormatParseException::friendlyText() {
     switch (type) {
         case FILE_NOT_FOUND:
-            return "Input file was not found!";
+            return "File " + getInfo().at(0).toString() + " was not found!";
             break;
         case FILE_CANNOT_BE_OPENED:
-            return "Input file could not be opened!";
+            return "File " + getInfo().at(0).toString() + " could not be opened!";
             break;
         case INVALID_MAGIC:
             return "File header not recognized as a .J2L file!";

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <QString>
 #include <QVector>
+#include <QSettings>
 #include "PCLevelConverter.h"
 
 #include "Jazz2FormatDataBlock.h"
@@ -63,6 +64,7 @@ class Jazz2Level {
 public:
     Jazz2Level();
     static Jazz2Level* fromFile(const QString& filename, bool strictParser = false);
+    void saveAsProjectCarrotLevel(const QDir& directory, const QString& uniqueID);
     void printData(std::ostream& target);
 
 private:
@@ -97,11 +99,15 @@ private:
     void loadEvents(Jazz2FormatDataBlock& block, bool strictParser);
     void loadLayers(Jazz2FormatDataBlock& dictBlock, quint32 dictLength, Jazz2FormatDataBlock& layoutBlock, bool strictParser);
 
+    // PC file writing functions
+    void writePCConfigFile(const QString& filename, const QString& uniqueID);
+    void writePCConfigFileLayerSection(QSettings& file, const QString& sectionName, const Jazz2Layer& layer, bool addBackgroundFields);
+    void writePCLayer(const QString& filename, const Jazz2Layer& layer);
+    void writePCEvents(const QString& filename, quint32 width, quint32 height);
+    void writePCAnimatedTiles(const QString& filename);
+
     int maxSupportedTiles();
     int maxSupportedAnims();
 
     const static quint8 JAZZ2_LAYER_COUNT;
-
-    // Temporary, while the code is still in flux
-    friend PCLevelConverter;
 };

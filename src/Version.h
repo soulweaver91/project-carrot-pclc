@@ -1,0 +1,4 @@
+#pragma once
+#define CONVERTERVERSION "0.5.13"
+#define LAYERFORMATVERSION 5
+#define EVENTSETVERSION 11
