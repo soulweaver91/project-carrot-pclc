@@ -9,45 +9,45 @@
 #include "Jazz2FormatDataBlock.h"
 
 struct Jazz2Layer {
-    quint32 flags;              // covered x and y tiling
-    quint8 type;                // ???
-    bool used;                  // covered as far as it seems to be used
-    quint32 width;              // covered
-    quint32 width_internal;     // covered?
-    quint32 height;             // covered
-    qint32 depth;               // ??? covered by PCLC, not covered by PC itself
-    quint8 detail_level;        // ???
-    double wave_x;              // not functional?
-    double wave_y;              // not functional?
-    double speed_x;             // covered
-    double speed_y;             // covered
-    double auto_x;              // covered
-    double auto_y;              // covered
-    quint8 tex_type;            // covered
-    quint8 tex_param[3];        // covered
+    quint32 flags;              // all except Parallax Stars supported
+    quint8 type;                // ignored
+    bool used;                  // supported
+    quint32 width;              // supported
+    quint32 internalWidth;      // supported
+    quint32 height;             // supported
+    qint32 depth;               // written, but not used
+    quint8 detailLevel;         // written, but not used
+    double waveX;               // ignored
+    double waveY;               // ignored
+    double speedX;              // supported
+    double speedY;              // supported
+    double autoSpeedX;          // supported
+    double autoSpeedY;          // supported
+    quint8 texturedType;        // supported
+    quint8 texturedParams[3];   // supported
     QList<QList<quint16>> tiles;
 };
 
 struct Jazz2TileEvent {
-    quint8 event_type;          // defined events covered
-    quint8 difficulty;          // not covered
-    bool illuminate;            // not covered
-    quint32 params;             // defined events covered
+    quint8 eventType;           // subset of events supported
+    quint8 difficulty;          // not yet supported
+    bool illuminate;            // not yet supported
+    quint32 params;             // supported to some degree
 };
 
 struct Jazz2TileProperty {
-    Jazz2TileEvent event;       // covered
-    quint8 flipped;             // covered
-    quint8 type;                // not covered
+    Jazz2TileEvent event;       // supported
+    quint8 flipped;             // supported
+    quint8 type;                // not yet supported
 };
 
 struct Jazz2AniTile {
     quint16 delay;
-    quint16 delay_jitter;
-    quint16 reverse_delay;
-    bool is_reverse;
+    quint16 delayJitter;
+    quint16 reverseDelay;
+    bool isReverse;
     quint8 speed;
-    quint8 frame_cnt;
+    quint8 frameCount;
     quint16 frames[64];
 };
 

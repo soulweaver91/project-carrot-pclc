@@ -95,8 +95,8 @@ void Jazz2Level::printData(std::ostream& target) {
     QString flagNames[32] = { "Tile X", "Tile Y", "Limit Visible Area", "Textured Mode", "Parallax Stars" };
     for (unsigned i = 0; i < layers.length(); ++i) {
         target << "Layer #" << (i + 1) << " (" << layers[i].width   << " x "   << layers[i].height  << ")\n"
-               << "  Speeds: X "      << layers[i].speed_x << " / Y " << layers[i].speed_y << "\n"
-               << "  Auto speeds: X " << layers[i].auto_x  << " / Y " << layers[i].auto_y  << "\n";
+               << "  Speeds: X "      << layers[i].speedX      << " / Y " << layers[i].speedY      << "\n"
+               << "  Auto speeds: X " << layers[i].autoSpeedX  << " / Y " << layers[i].autoSpeedY  << "\n";
 
         QStringList appliedFlags;
         for (unsigned j = 0; j < 32; ++j) {
@@ -112,9 +112,9 @@ void Jazz2Level::printData(std::ostream& target) {
 
         if ((layers[i].flags & 0x00000008) != 0) {
             target << "  Textured Mode colour:" 
-                   << " R" << (int)layers[i].tex_param[0] 
-                   << " G" << (int)layers[i].tex_param[1]
-                   << " B" << (int)layers[i].tex_param[2] << "\n";
+                   << " R" << (int)layers[i].texturedParams[0]
+                   << " G" << (int)layers[i].texturedParams[1]
+                   << " B" << (int)layers[i].texturedParams[2] << "\n";
         }
 
         target << "\n";
@@ -211,7 +211,7 @@ void Jazz2Level::loadStaticTileData(Jazz2FormatDataBlock& block, bool strictPars
     for (unsigned i = 0; i < tileCount; ++i) {
         Jazz2TileProperty tileProperties;
         qint32 tileEvent = block.readUInt();
-        tileProperties.event.event_type = tileEvent & 0x000000FF;
+        tileProperties.event.eventType = tileEvent & 0x000000FF;
         tileProperties.event.difficulty = (tileEvent & 0x0000C000) >> 14;
         tileProperties.event.illuminate = ((tileEvent & 0x00002000) >> 13 == 1);
         // TODO: test this
@@ -232,11 +232,11 @@ void Jazz2Level::loadAnimatedTiles(Jazz2FormatDataBlock& block, bool strictParse
     for (unsigned i = 0; i < animCount; ++i) {
         Jazz2AniTile animatedTile;
         animatedTile.delay = block.readUShort();
-        animatedTile.delay_jitter = block.readUShort();
-        animatedTile.reverse_delay = block.readUShort();
-        animatedTile.is_reverse = block.readBool();
+        animatedTile.delayJitter = block.readUShort();
+        animatedTile.reverseDelay = block.readUShort();
+        animatedTile.isReverse = block.readBool();
         animatedTile.speed = block.readChar(); // 0-70
-        animatedTile.frame_cnt = block.readChar();
+        animatedTile.frameCount = block.readChar();
 
         for (unsigned j = 0; j < 64; ++j) {
             animatedTile.frames[j] = block.readUShort();
@@ -271,7 +271,7 @@ void Jazz2Level::loadLayerMetadata(Jazz2FormatDataBlock& block, bool strictParse
 
     // This is related to how data is presented in the file; the above is a WYSIWYG version, solely shown on the UI
     for (unsigned i = 0; i < JAZZ2_LAYER_COUNT; ++i) {
-        layers[i].width_internal = block.readUInt();
+        layers[i].internalWidth = block.readUInt();
     }
 
     for (unsigned i = 0; i < JAZZ2_LAYER_COUNT; ++i) {
@@ -283,40 +283,40 @@ void Jazz2Level::loadLayerMetadata(Jazz2FormatDataBlock& block, bool strictParse
     }
 
     for (unsigned i = 0; i < JAZZ2_LAYER_COUNT; ++i) {
-        layers[i].detail_level = block.readChar();
+        layers[i].detailLevel = block.readChar();
     }
 
     for (unsigned i = 0; i < JAZZ2_LAYER_COUNT; ++i) {
-        layers[i].wave_x = block.readFloat();
+        layers[i].waveX = block.readFloat();
     }
 
     for (unsigned i = 0; i < JAZZ2_LAYER_COUNT; ++i) {
-        layers[i].wave_y = block.readFloat();
+        layers[i].waveY = block.readFloat();
     }
 
     for (unsigned i = 0; i < JAZZ2_LAYER_COUNT; ++i) {
-        layers[i].speed_x = block.readFloat();
+        layers[i].speedX = block.readFloat();
     }
 
     for (unsigned i = 0; i < JAZZ2_LAYER_COUNT; ++i) {
-        layers[i].speed_y = block.readFloat();
+        layers[i].speedY = block.readFloat();
     }
 
     for (unsigned i = 0; i < JAZZ2_LAYER_COUNT; ++i) {
-        layers[i].auto_x = block.readFloat();
+        layers[i].autoSpeedX = block.readFloat();
     }
 
     for (unsigned i = 0; i < JAZZ2_LAYER_COUNT; ++i) {
-        layers[i].auto_y = block.readFloat();
+        layers[i].autoSpeedY = block.readFloat();
     }
 
     for (unsigned i = 0; i < JAZZ2_LAYER_COUNT; ++i) {
-        layers[i].tex_type = block.readChar();
+        layers[i].texturedType = block.readChar();
     }
 
     for (unsigned i = 0; i < JAZZ2_LAYER_COUNT; ++i) {
         for (unsigned j = 0; j < 3; ++j) {
-            layers[i].tex_param[j] = block.readChar();
+            layers[i].texturedParams[j] = block.readChar();
         }
     }
 }
@@ -331,7 +331,7 @@ void Jazz2Level::loadEvents(Jazz2FormatDataBlock& block, bool strictParser) {
             for (unsigned j = 0; j < layers.at(3).width; ++j) {
                 Jazz2TileEvent event;
                 qint32 eventData = block.readUInt();
-                event.event_type = (eventData & 0x000000FF);
+                event.eventType = (eventData & 0x000000FF);
                 event.difficulty = ((eventData & 0x00000300) >> 8) % 4;
                 event.illuminate = ((eventData & 0x00000400) >> 10 == 1);
                 event.params = ((eventData & 0xFFFFF000) >> 12);
@@ -357,7 +357,7 @@ void Jazz2Level::loadLayers(Jazz2FormatDataBlock& dictBlock, quint32 dictLength,
         if (layers.at(i).used) {
             for (unsigned y = 0; y < layers.at(i).height; ++y) {
                 QList< quint16 > new_row;
-                for (unsigned x = 0; x < layers.at(i).width_internal; x += 4) {
+                for (unsigned x = 0; x < layers.at(i).internalWidth; x += 4) {
                     quint16 s_dict = layoutBlock.readUShort();
                     for (unsigned j = 0; j < 4; j++) {
                         if (x + j >= layers.at(i).width) {
@@ -436,22 +436,22 @@ void Jazz2Level::writePCConfigFileLayerSection(QSettings& file, const QString& s
     }
 
     file.beginGroup(sectionName);
-    file.setValue("XSpeed",          layer.speed_x);
-    file.setValue("YSpeed",          layer.speed_y);
-    file.setValue("XAutoSpeed",      layer.auto_x);
-    file.setValue("YAutoSpeed",      layer.auto_y);
+    file.setValue("XSpeed",          layer.speedX);
+    file.setValue("YSpeed",          layer.speedY);
+    file.setValue("XAutoSpeed",      layer.autoSpeedX);
+    file.setValue("YAutoSpeed",      layer.autoSpeedY);
     file.setValue("XRepeat",        (layer.flags & 0x00000001) > 0);
     file.setValue("YRepeat",        (layer.flags & 0x00000002) > 0);
     file.setValue("J2L.Depth",       layer.depth);
-    file.setValue("J2L.DetailLevel", layer.detail_level);
+    file.setValue("J2L.DetailLevel", layer.detailLevel);
     file.setValue("InherentOffset", (layer.flags & 0x00000004) > 0); // "Limit Visible Region"
 
     if (addBackgroundFields) {
-        file.setValue("TexturedMode", layer.tex_type);
+        file.setValue("TexturedMode", layer.texturedType);
         file.setValue("TexturedModeColor", '#'
-                      + QString::number(layer.tex_param[0], 16).rightJustified(2, '0')
-                      + QString::number(layer.tex_param[1], 16).rightJustified(2, '0')
-                      + QString::number(layer.tex_param[2], 16).rightJustified(2, '0'));
+                      + QString::number(layer.texturedParams[0], 16).rightJustified(2, '0')
+                      + QString::number(layer.texturedParams[1], 16).rightJustified(2, '0')
+                      + QString::number(layer.texturedParams[2], 16).rightJustified(2, '0'));
         file.setValue("TexturedModeEnabled",  (layer.flags & 0x00000008) > 0);
         file.setValue("ParallaxStarsEnabled", (layer.flags & 0x00000010) > 0);
     }
@@ -518,7 +518,7 @@ void Jazz2Level::writePCEvents(const QString& filename, quint32 width, quint32 h
             auto& event = events.at(y * width + x);
 
             quint8 flags = event.illuminate + (event.difficulty * 2);
-            auto converted = EventConverter::convert(event.event_type, event.params);
+            auto converted = EventConverter::convert(event.eventType, event.params);
 
             outputStream << (quint16)converted.event << flags;
             for (int i = 0; i < 8; ++i) {
@@ -543,14 +543,14 @@ void Jazz2Level::writePCAnimatedTiles(const QString& filename) {
 
     for (Jazz2AniTile tile : animatedTiles) {
         for (int i = 0; i < 64; ++i) {
-            if (i >= tile.frame_cnt) {
+            if (i >= tile.frameCount) {
                 outputStream << (quint16)(0xFFFF);
             } else {
                 outputStream << tile.frames[i];
             }
         }
-        quint8 reverse = tile.is_reverse ? 1 : 0;
-        outputStream << tile.speed << tile.delay << tile.delay_jitter << reverse << tile.reverse_delay;
+        quint8 reverse = tile.isReverse ? 1 : 0;
+        outputStream << tile.speed << tile.delay << tile.delayJitter << reverse << tile.reverseDelay;
     }
 
     file.write(qCompress(outputBuffer));
