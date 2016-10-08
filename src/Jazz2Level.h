@@ -1,12 +1,15 @@
 #pragma once
 
 #include <iostream>
+#include <QDir>
 #include <QString>
 #include <QVector>
 #include <QSettings>
-#include "PCLevelConverter.h"
-
+#include <QSet>
+#include "JJ2Event.h"
+#include "PCEvent.h"
 #include "Jazz2FormatDataBlock.h"
+#include "EventConverter.h"
 
 struct Jazz2Layer {
     quint32 flags;              // all except Parallax Stars supported
@@ -55,6 +58,32 @@ struct Jazz2DictionaryEntry {
     quint16 tiles[4];
 };
 
+struct PCLevelEventConversionStatistics {
+    struct PCEventAppearance {
+        quint16 x;
+        quint16 y;
+        JJ2Event originalEventType;
+        QString originalEventName;
+        PCEvent eventType;
+        QString eventName;
+        ParamArray params;
+        quint8 difficulty;
+        bool illuminate;
+    };
+
+    struct UnsupportedEvent {
+        quint16 count;
+        QString eventName;
+    };
+
+    QVector<PCEventAppearance> eventAppearances;
+    QMap<JJ2Event, std::shared_ptr<UnsupportedEvent>> unsupportedEvents;
+};
+
+struct PCLevelConversionStatistics {
+    PCLevelEventConversionStatistics events;
+};
+
 enum Jazz2LevelVersion {
     BASE_GAME,
     TSF
@@ -64,7 +93,7 @@ class Jazz2Level {
 public:
     Jazz2Level();
     static Jazz2Level* fromFile(const QString& filename, bool strictParser = false);
-    void saveAsProjectCarrotLevel(const QDir& directory, const QString& uniqueID);
+    PCLevelConversionStatistics saveAsProjectCarrotLevel(const QDir& directory, const QString& uniqueID);
     void printData(std::ostream& target);
 
 private:
@@ -103,7 +132,7 @@ private:
     void writePCConfigFile(const QString& filename, const QString& uniqueID);
     void writePCConfigFileLayerSection(QSettings& file, const QString& sectionName, const Jazz2Layer& layer, bool addBackgroundFields);
     void writePCLayer(const QString& filename, const Jazz2Layer& layer);
-    void writePCEvents(const QString& filename, quint32 width, quint32 height);
+    PCLevelEventConversionStatistics writePCEvents(const QString& filename, quint32 width, quint32 height);
     void writePCAnimatedTiles(const QString& filename);
 
     int maxSupportedTiles();

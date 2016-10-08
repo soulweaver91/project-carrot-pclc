@@ -4,6 +4,7 @@
 #include <QDataStream>
 #include <QByteArray>
 #include <exception>
+#include <algorithm>
 
 #include "Jazz2FormatParseException.h"
 #include "EventConverter.h"
@@ -53,7 +54,7 @@ Jazz2Level* Jazz2Level::fromFile(const QString& filename, bool strictParser) {
     return level;
 }
 
-void Jazz2Level::saveAsProjectCarrotLevel(const QDir& directory, const QString& uniqueID) {
+PCLevelConversionStatistics Jazz2Level::saveAsProjectCarrotLevel(const QDir& directory, const QString& uniqueID) {
     const QString absoluteDir = directory.absolutePath();
 
     writePCConfigFile(absoluteDir + "/config.ini", uniqueID);
@@ -67,9 +68,11 @@ void Jazz2Level::saveAsProjectCarrotLevel(const QDir& directory, const QString& 
         writePCLayer(absoluteDir + "/" + QString::number(6 - i) + ".bg.layer", layers[i]);
     }
 
-    writePCEvents(absoluteDir + "/event.layer", layers[3].width, layers[3].height);
+    PCLevelConversionStatistics stats = { writePCEvents(absoluteDir + "/event.layer", layers[3].width, layers[3].height) };
 
     writePCAnimatedTiles(absoluteDir + "/animtiles.dat");
+
+    return stats;
 }
 
 void Jazz2Level::printData(std::ostream& target) {
@@ -116,9 +119,13 @@ void Jazz2Level::printData(std::ostream& target) {
                    << " G" << (int)layers[i].texturedParams[1]
                    << " B" << (int)layers[i].texturedParams[2] << "\n";
         }
-
-        target << "\n";
     }
+
+    quint32 animCount = std::accumulate(animatedTiles.begin(), animatedTiles.end(), 0, [](auto a, auto b) {
+        return a + (b.frameCount > 0 ? 1 : 0);
+    });
+
+    target << "\n" << animCount << " animated tile" << (animCount == 0 ? "" : "s") << " defined.\n\n";
 }
 
 Jazz2Level::Jazz2Level(Jazz2FormatDataBlock& header, quint32 fileLength, bool strictParser) {
@@ -505,7 +512,9 @@ void Jazz2Level::writePCLayer(const QString& filename, const Jazz2Layer& layer) 
     file.close();
 }
 
-void Jazz2Level::writePCEvents(const QString& filename, quint32 width, quint32 height) {
+PCLevelEventConversionStatistics Jazz2Level::writePCEvents(const QString& filename, quint32 width, quint32 height) {
+    PCLevelEventConversionStatistics stats;
+
     QFile file(filename);
     if (!(file.open(QIODevice::WriteOnly))) {
         throw Jazz2FormatParseException(FILE_CANNOT_BE_OPENED, { filename });
@@ -520,6 +529,23 @@ void Jazz2Level::writePCEvents(const QString& filename, quint32 width, quint32 h
             quint8 flags = event.illuminate + (event.difficulty * 2);
             auto converted = EventConverter::convert(event.eventType, event.params);
 
+            if (event.eventType != JJ2_EMPTY) {
+                if (converted.event == PC_EMPTY) {
+                    if (!stats.unsupportedEvents.contains((JJ2Event)event.eventType)) {
+                        stats.unsupportedEvents.insert((JJ2Event)event.eventType,
+                            std::make_shared<PCLevelEventConversionStatistics::UnsupportedEvent>());
+                        stats.unsupportedEvents.value((JJ2Event)event.eventType)->eventName = EventConverter::getJazz2EventName(event.eventType);
+                    }
+                    stats.unsupportedEvents.value((JJ2Event)event.eventType)->count++;
+                    
+                } else {
+                    stats.eventAppearances.append({ (quint16)x, (quint16)y,
+                                                  (JJ2Event)event.eventType, EventConverter::getJazz2EventName(event.eventType), 
+                                                  converted.event, EventConverter::getPCEventName(converted.event), converted.parameters, 
+                                                  event.difficulty, event.illuminate });
+                }
+            }
+
             outputStream << (quint16)converted.event << flags;
             for (int i = 0; i < 8; ++i) {
                 outputStream << converted.parameters.at(i);
@@ -530,6 +556,8 @@ void Jazz2Level::writePCEvents(const QString& filename, quint32 width, quint32 h
 
     file.write(qCompress(outputBuffer));
     file.close();
+
+    return stats;
 }
 
 void Jazz2Level::writePCAnimatedTiles(const QString& filename) {

@@ -31,7 +31,8 @@ class EventConverter {
 public:
     static ConversionResult convert(JJ2Event old, quint32 params);
     static ConversionResult convert(quint16 old, quint32 params);
-    static QString eventName(quint16 num);
+    static QString getJazz2EventName(quint16 num);
+    static QString getPCEventName(PCEvent ev);
 private:
     static void init();
     static QMap<JJ2Event, ConversionFunction> assigned;
@@ -44,4 +45,5 @@ private:
     static ParamArray convertParamInt(quint32 paramInt, JJ2EventParamListDefinition paramTypes);
 
     const static QStringList JJ2EventNames;
+    const static QMap<PCEvent, QString> PCEventNames;
 };

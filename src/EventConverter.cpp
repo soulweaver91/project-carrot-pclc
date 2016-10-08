@@ -15,7 +15,7 @@ ConversionResult EventConverter::convert(quint16 old, quint32 params) {
     return convert(static_cast<JJ2Event>(old), params);
 }
 
-QString EventConverter::eventName(quint16 num) {
+QString EventConverter::getJazz2EventName(quint16 num) {
     if (assigned.size() == 0) {
         init();
     }
@@ -24,6 +24,10 @@ QString EventConverter::eventName(quint16 num) {
     } else {
         return JJ2EventNames[num];
     }
+}
+
+QString EventConverter::getPCEventName(PCEvent ev) {
+    return PCEventNames.value(ev, "(unknown, not defined)");
 }
 
 void EventConverter::init() {
@@ -560,4 +564,111 @@ const QStringList EventConverter::JJ2EventNames = {
     "Ghost",
     "UNUSED",
     "UNUSED"
+};
+
+const QMap<PCEvent, QString> EventConverter::PCEventNames = {
+    { PC_EMPTY                   , "Empty" },
+    { PC_FAST_FIRE               , "Fast Fire" },
+    { PC_AMMO_BOUNCER            , "Bouncer Ammo" },
+    { PC_AMMO_FREEZER            , "Freezer Ammo" },
+    { PC_AMMO_SEEKER             , "Seeker Ammo" },
+    { PC_AMMO_RF                 , "RF Ammo" },
+    { PC_AMMO_TOASTER            , "Toaster Ammo" },
+    { PC_AMMO_TNT                , "TNT Ammo" },
+    { PC_AMMO_PEPPER             , "Pepper Ammo" },
+    { PC_AMMO_ELECTRO            , "Electro Ammo" },
+    { PC_POWERUP_BLASTER         , "Blaster Power-Up" },
+    { PC_POWERUP_BOUNCER         , "Bouncer Power-Up" },
+    { PC_POWERUP_FREEZER         , "Freezer Power-Up" },
+    { PC_POWERUP_SEEKER          , "Seeker Power-Up" },
+    { PC_POWERUP_RF              , "RF Power-Up" },
+    { PC_POWERUP_TOASTER         , "Toaster Power-Up" },
+    { PC_POWERUP_TNT             , "TNT Power-Up" },
+    { PC_POWERUP_PEPPER          , "Pepper Power-Up" },
+    { PC_POWERUP_ELECTRO         , "Electro Power-Up" },
+    { PC_GEM_RED                 , "Red Gem" },
+    { PC_GEM_GREEN               , "Green Gem" },
+    { PC_GEM_BLUE                , "Blue Gem" },
+    { PC_GEM_PURPLE              , "Purple Gem" },
+    { PC_SAVE_POINT              , "Save Point" },
+    { PC_SPRING_RED              , "Red Spring" },
+    { PC_SPRING_GREEN            , "Green Spring" },
+    { PC_SPRING_BLUE             , "Blue Spring" },
+    { PC_JAZZ_LEVEL_START        , "Jazz Level Start" },
+    { PC_SPAZ_LEVEL_START        , "Spaz Level Start" },
+    { PC_LORI_LEVEL_START        , "Lori Level Start" },
+    { PC_AREA_EOL                , "Area EOL" },
+    { PC_WARP_ORIGIN             , "Warp Origin" },
+    { PC_WARP_TARGET             , "Warp Target" },
+    { PC_MODIFIER_VINE           , "Vine" },
+    { PC_MODIFIER_ONE_WAY        , "One Way" },
+    { PC_MODIFIER_HOOK           , "Hook" },
+    { PC_MODIFIER_H_POLE         , "Hor. Pole" },
+    { PC_MODIFIER_V_POLE         , "Ver. Pole" },
+    { PC_SCENERY_DESTRUCT        , "Destructible Scenery" },
+    { PC_SCENERY_BUTTSTOMP       , "Buttstomp Scenery" },
+    { PC_MODIFIER_HURT           , "Hurt" },
+    { PC_LIGHT_SET               , "Set Light" },
+    { PC_LIGHT_RESET             , "Reset Light" },
+    { PC_ENEMY_TURTLE_NORMAL     , "Normal Turtle" },
+    { PC_ENEMY_LIZARD            , "Lizard" },
+    { PC_PUSHABLE_ROCK           , "Pushable Object" },
+    { PC_TRIGGER_CRATE           , "Trigger Crate" },
+    { PC_TRIGGER_AREA            , "Trigger Area" },
+    { PC_MODIFIER_RICOCHET       , "Ricochet" },
+    { PC_BRIDGE                  , "Bridge" },
+    { PC_AREA_STOP_ENEMY         , "Stop Enemy" },
+    { PC_COIN_SILVER             , "Silver Coin" },
+    { PC_COIN_GOLD               , "Gold Coin" },
+    { PC_MOVING_PLATFORM         , "Moving Platform" },
+    { PC_AREA_FLOAT_UP           , "Float Up" },
+    { PC_MODIFIER_TUBE           , "Tube" },
+    { PC_FOOD_APPLE              , "Apple" },
+    { PC_FOOD_BANANA             , "Banana" },
+    { PC_FOOD_CHERRY             , "Cherry" },
+    { PC_FOOD_ORANGE             , "Orange" },
+    { PC_FOOD_PEAR               , "Pear" },
+    { PC_FOOD_PRETZEL            , "Pretzel" },
+    { PC_FOOD_STRAWBERRY         , "Strawberry" },
+    { PC_FOOD_LEMON              , "Lemon" },
+    { PC_FOOD_LIME               , "Lime" },
+    { PC_FOOD_THING              , "Thing" },
+    { PC_FOOD_WATERMELON         , "Watermelon" },
+    { PC_FOOD_PEACH              , "Peach" },
+    { PC_FOOD_GRAPES             , "Grapes" },
+    { PC_FOOD_LETTUCE            , "Lettuce" },
+    { PC_FOOD_EGGPLANT           , "Eggplant" },
+    { PC_FOOD_CUCUMBER           , "Cucumber" },
+    { PC_FOOD_PEPSI              , "Pepsi" },
+    { PC_FOOD_COKE               , "Coke" },
+    { PC_FOOD_MILK               , "Milk" },
+    { PC_FOOD_PIE                , "Pie" },
+    { PC_FOOD_CAKE               , "Cake" },
+    { PC_FOOD_DONUT              , "Donut" },
+    { PC_FOOD_CUPCAKE            , "Cupcake" },
+    { PC_FOOD_CHIPS              , "Chips" },
+    { PC_FOOD_CANDY              , "Candy" },
+    { PC_FOOD_CHOCOLATE          , "Chocolate" },
+    { PC_FOOD_ICE_CREAM          , "Ice Cream" },
+    { PC_FOOD_BURGER             , "Burger" },
+    { PC_FOOD_PIZZA              , "Pizza" },
+    { PC_FOOD_FRIES              , "Fries" },
+    { PC_FOOD_CHICKEN_LEG        , "Chicken Leg" },
+    { PC_FOOD_SANDWICH           , "Sandwich" },
+    { PC_FOOD_TACO               , "Taco" },
+    { PC_FOOD_HOT_DOG            , "Hot Dog" },
+    { PC_FOOD_HAM                , "Ham" },
+    { PC_FOOD_CHEESE             , "Cheese" },
+    { PC_SCENERY_DESTRUCT_SPD    , "Speed Scenery" },
+    { PC_SCENERY_COLLAPSE        , "Collapsible Scenery" },
+    { PC_CARROT                  , "Carrot" },
+    { PC_TURTLE_SHELL            , "Turtle Shell" },
+    { PC_CARROT_FULL             , "Full Energy Carrot" },
+    { PC_WARP_COIN_BONUS         , "Bonus Warp" },
+    { PC_ENEMY_SUCKER            , "Sucker" },
+    { PC_ENEMY_SUCKER_FLOAT      , "Sucker Float" },
+    { PC_ENEMY_LAB_RAT           , "Lab Rat" },
+    { PC_LIGHT_STEADY            , "Steady Light" },
+    { PC_LIGHT_PULSE             , "Pulse Light" },
+    { PC_AREA_TEXT               , "Text" },
 };
