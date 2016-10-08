@@ -22,6 +22,9 @@
     <Filter Include="Documents">
       <UniqueIdentifier>{9814bda4-81e6-4773-9403-5d36f100d7b0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Configuration">
+      <UniqueIdentifier>{aaf923f6-49f0-4fd9-9a9d-c0ec4411ad50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Jazz2Level.cpp">
@@ -50,7 +53,13 @@
       <Filter>Documents</Filter>
     </None>
     <None Include=".gitignore">
-      <Filter>Documents</Filter>
+      <Filter>Configuration</Filter>
+    </None>
+    <None Include="PCLevelConverter.pri">
+      <Filter>Configuration</Filter>
+    </None>
+    <None Include="PCLevelConverter.pro">
+      <Filter>Configuration</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
