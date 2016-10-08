@@ -140,17 +140,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="EventIDConverter.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\EventConverter.cpp" />
+    <ClCompile Include="src\Jazz2Level.cpp" />
+    <ClCompile Include="src\Jazz2FormatDataBlock.cpp" />
+    <ClCompile Include="src\Jazz2FormatParseException.cpp" />
+    <ClCompile Include="src\PCLevelConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EventIDConverter.h" />
+    <ClInclude Include="src\EventConverter.h" />
+    <ClInclude Include="src\Jazz2Level.h" />
+    <ClInclude Include="src\Jazz2FormatDataBlock.h" />
+    <ClInclude Include="src\Jazz2FormatParseException.h" />
+    <ClInclude Include="src\JJ2Event.h" />
+    <ClInclude Include="src\PCEvent.h" />
+    <ClInclude Include="src\PCLevelConverter.h" />
+    <ClInclude Include="src\Version.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="LICENSE" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include="PCLevelConverter.pri" />
+    <None Include="PCLevelConverter.pro" />
     <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
