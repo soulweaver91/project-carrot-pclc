@@ -502,8 +502,13 @@ void Jazz2Level::writePCLayer(const QString& filename, const Jazz2Layer& layer) 
                 tileIdx -= lastTilesetTileIndex;
             }
 
-            quint8 tile_flags = (flipX ? 0x01 : 0) + (flipY ? 0x02 : 0) + (animated ? 0x04 : 0);
-            outputStream << tileIdx << tile_flags;
+            bool legacyTranslucent = false;
+            if (!animated && tileIdx < lastTilesetTileIndex) {
+                legacyTranslucent = (staticTiles[tileIdx].type & 0x01) == 0x01;
+            }
+
+            quint8 tileFlags = (flipX ? 0x01 : 0) + (flipY ? 0x02 : 0) + (animated ? 0x04 : 0) + (legacyTranslucent ? 0x80 : 0);
+            outputStream << tileIdx << tileFlags;
         }
         outputStream << (quint16)(0xFFFF);
     }
@@ -572,9 +577,10 @@ void Jazz2Level::writePCAnimatedTiles(const QString& filename) {
     for (Jazz2AniTile tile : animatedTiles) {
         for (int i = 0; i < 64; ++i) {
             if (i >= tile.frameCount) {
-                outputStream << (quint16)(0xFFFF);
+                outputStream << (quint16)(0xFFFF) << (quint8)(0xFF);
             } else {
-                outputStream << tile.frames[i];
+                quint8 tileFlags = (staticTiles[tile.frames[i]].type & 0x01) == 0x01 ? 0x80 : 0;
+                outputStream << tile.frames[i] << tileFlags;
             }
         }
         quint8 reverse = tile.isReverse ? 1 : 0;
