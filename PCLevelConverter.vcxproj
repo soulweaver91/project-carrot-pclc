@@ -160,6 +160,7 @@
     <Text Include="LICENSE" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitattributes" />
     <None Include=".gitignore" />
     <None Include="PCLevelConverter.pri" />
     <None Include="PCLevelConverter.pro" />

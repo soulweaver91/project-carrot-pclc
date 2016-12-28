@@ -61,6 +61,9 @@
     <None Include="PCLevelConverter.pro">
       <Filter>Configuration</Filter>
     </None>
+    <None Include=".gitattributes">
+      <Filter>Configuration</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Jazz2Level.h">
