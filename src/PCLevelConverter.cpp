@@ -1,5 +1,5 @@
 // J2L to native Project Carrot level file converter
-// (c) 2013-2016 Soulweaver
+// (c) 2013-2017 Soulweaver
 
 #include <QDir>
 #include <QFileInfo>
