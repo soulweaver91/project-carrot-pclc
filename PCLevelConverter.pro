@@ -7,10 +7,16 @@ TARGET = PCLevelConverter
 
 QT += core
 DEFINES += QT_DLL
-CONFIG += debug console
+CONFIG += c++14 debug_and_release console
 
-INCLUDEPATH += . \
+INCLUDEPATH += ./GeneratedFiles \
     .
+
+macx {
+    INCLUDEPATH += /usr/local/include
+    LIBS += -L"/usr/local/lib"
+}
+
 DEPENDPATH += .
 
 UI_DIR += ./GeneratedFiles
