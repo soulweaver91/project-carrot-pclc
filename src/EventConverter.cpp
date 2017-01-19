@@ -213,6 +213,7 @@ void EventConverter::init() {
         { UINT, 8 }, // Text
         { BOOL, 1 }  // Vanish
     }}));
+    assigned.insert(JJ2_AREA_EOL_WARP, getConstantParameterListConverter(PC_AREA_EOL, { 0, 1 }));
 }
 
 ConversionFunction EventConverter::getTrivialConverter(PCEvent ev) {
