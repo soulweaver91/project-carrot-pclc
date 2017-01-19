@@ -51,7 +51,7 @@ void PCLevelConverter::printDetailedEventStats(const PCLevelConversionStatistics
 }
 
 int main(int argc, char *argv[]) {
-    if (argc < 3 || argc > 4) {
+    if (argc < 2 || argc > 4) {
         std::cout << "PCLC version " << CONVERTERVERSION << "\n"
             << "Usage: pclc name inputfile\n\n"
             << "Converts a Jazz Jackrabbit 2 level file (.j2l) to the native, multiple file\n"
