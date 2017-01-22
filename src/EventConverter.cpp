@@ -220,6 +220,8 @@ void EventConverter::init() {
     assigned.insert(JJ2_CRATE_AMMO_SEEKER, getAmmoCrateConverter(3));
     assigned.insert(JJ2_CRATE_AMMO_RF, getAmmoCrateConverter(4));
     assigned.insert(JJ2_CRATE_AMMO_TOASTER, getAmmoCrateConverter(5));
+    assigned.insert(JJ2_CRATE_CARROT, getConstantParameterListConverter(PC_CRATE_GENERAL, { (quint16)PC_CARROT, 1 }));
+    assigned.insert(JJ2_CRATE_SPRING, getConstantParameterListConverter(PC_CRATE_GENERAL, { (quint16)PC_SPRING_GREEN, 1 }));
 }
 
 ConversionFunction EventConverter::getTrivialConverter(PCEvent ev) {
