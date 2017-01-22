@@ -239,6 +239,7 @@ void EventConverter::init() {
         { UINT, 4 }, // Blue
         { UINT, 4 }  // Purple
     }}));
+    assigned.insert(JJ2_ONEUP, getTrivialConverter(PC_ONEUP));
 }
 
 ConversionFunction EventConverter::getTrivialConverter(PCEvent ev) {
