@@ -41,6 +41,7 @@ private:
     static ConversionFunction getTrivialParameterListConverter(PCEvent ev, JJ2EventParamListDefinition paramDefs);
     static ConversionFunction getSpringConverter(PCEvent ev, bool horizontal);
     static ConversionFunction getPlatformConverter(quint8 type);
+    static ConversionFunction getAmmoCrateConverter(quint8 type);
 
     static ParamArray convertParamInt(quint32 paramInt, JJ2EventParamListDefinition paramTypes);
 

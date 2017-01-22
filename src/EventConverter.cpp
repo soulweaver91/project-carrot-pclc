@@ -214,6 +214,12 @@ void EventConverter::init() {
         { BOOL, 1 }  // Vanish
     }}));
     assigned.insert(JJ2_AREA_EOL_WARP, getConstantParameterListConverter(PC_AREA_EOL, { 0, 1 }));
+    assigned.insert(JJ2_CRATE_AMMO, getAmmoCrateConverter(0));
+    assigned.insert(JJ2_CRATE_AMMO_BOUNCER, getAmmoCrateConverter(1));
+    assigned.insert(JJ2_CRATE_AMMO_FREEZER, getAmmoCrateConverter(2));
+    assigned.insert(JJ2_CRATE_AMMO_SEEKER, getAmmoCrateConverter(3));
+    assigned.insert(JJ2_CRATE_AMMO_RF, getAmmoCrateConverter(4));
+    assigned.insert(JJ2_CRATE_AMMO_TOASTER, getAmmoCrateConverter(5));
 }
 
 ConversionFunction EventConverter::getTrivialConverter(PCEvent ev) {
@@ -259,6 +265,12 @@ ConversionFunction EventConverter::getPlatformConverter(quint8 type) {
         }});
 
         return { PC_MOVING_PLATFORM, { type, params[0], params[1], params[2], params[3], 0, 0, 0 }};
+    };
+}
+
+ConversionFunction EventConverter::getAmmoCrateConverter(quint8 type) {
+    return [type](quint32 paramInt) -> ConversionResult {
+        return{ PC_CRATE_AMMO, { type, 0, 0, 0, 0, 0, 0, 0 } };
     };
 }
 
@@ -672,4 +684,5 @@ const QMap<PCEvent, QString> EventConverter::PCEventNames = {
     { PC_LIGHT_STEADY            , "Steady Light" },
     { PC_LIGHT_PULSE             , "Pulse Light" },
     { PC_AREA_TEXT               , "Text" },
+    { PC_CRATE_AMMO              , "Ammo Crate" },
 };
