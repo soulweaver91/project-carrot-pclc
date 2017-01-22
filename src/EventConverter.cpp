@@ -222,6 +222,23 @@ void EventConverter::init() {
     assigned.insert(JJ2_CRATE_AMMO_TOASTER, getAmmoCrateConverter(5));
     assigned.insert(JJ2_CRATE_CARROT, getConstantParameterListConverter(PC_CRATE_GENERAL, { (quint16)PC_CARROT, 1 }));
     assigned.insert(JJ2_CRATE_SPRING, getConstantParameterListConverter(PC_CRATE_GENERAL, { (quint16)PC_SPRING_GREEN, 1 }));
+    assigned.insert(JJ2_CRATE_ONEUP, getConstantParameterListConverter(PC_CRATE_GENERAL, { (quint16)PC_ONEUP, 1 }));
+    assigned.insert(JJ2_CRATE_BOMB, getConstantParameterListConverter(PC_CRATE_GENERAL, { (quint16)PC_SCENERY_BOMB, 1 }));
+    assigned.insert(JJ2_BARREL_AMMO, getConstantParameterListConverter(PC_BARREL_AMMO, { 0 }));
+    assigned.insert(JJ2_BARREL_CARROT, getConstantParameterListConverter(PC_BARREL_GENERAL, { (quint16)PC_CARROT, 1 }));
+    assigned.insert(JJ2_BARREL_ONEUP, getConstantParameterListConverter(PC_BARREL_GENERAL, { (quint16)PC_ONEUP, 1 }));
+    assigned.insert(JJ2_CRATE_GEM, getTrivialParameterListConverter(PC_CRATE_GEM, {{
+        { UINT, 4 }, // Red
+        { UINT, 4 }, // Green
+        { UINT, 4 }, // Blue
+        { UINT, 4 }  // Purple
+    }}));
+    assigned.insert(JJ2_BARREL_GEM, getTrivialParameterListConverter(PC_BARREL_GEM, {{
+        { UINT, 4 }, // Red
+        { UINT, 4 }, // Green
+        { UINT, 4 }, // Blue
+        { UINT, 4 }  // Purple
+    }}));
 }
 
 ConversionFunction EventConverter::getTrivialConverter(PCEvent ev) {
@@ -686,5 +703,12 @@ const QMap<PCEvent, QString> EventConverter::PCEventNames = {
     { PC_LIGHT_STEADY            , "Steady Light" },
     { PC_LIGHT_PULSE             , "Pulse Light" },
     { PC_AREA_TEXT               , "Text" },
+    { PC_CRATE_GENERAL           , "General Crate" },
+    { PC_BARREL_GENERAL          , "General Barrel" },
     { PC_CRATE_AMMO              , "Ammo Crate" },
+    { PC_BARREL_AMMO             , "Ammo Barrel" },
+    { PC_CRATE_GEM               , "Gem Crate" },
+    { PC_BARREL_GEM              , "Gem Barrel" },
+    { PC_ONEUP                   , "1UP" },
+    { PC_SCENERY_BOMB            , "Scenery Bomb" },
 };
