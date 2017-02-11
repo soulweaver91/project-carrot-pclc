@@ -219,7 +219,7 @@ void Jazz2Level::loadStaticTileData(Jazz2FormatDataBlock& block, bool strictPars
         Jazz2TileProperty tileProperties;
         qint32 tileEvent = block.readUInt();
         tileProperties.event.eventType = tileEvent & 0x000000FF;
-        tileProperties.event.difficulty = (tileEvent & 0x0000C000) >> 14;
+        tileProperties.event.difficulty = (Jazz2EventDifficulty)((tileEvent & 0x0000C000) >> 14);
         tileProperties.event.illuminate = ((tileEvent & 0x00002000) >> 13 == 1);
         // TODO: test this
         tileProperties.event.params = ((tileEvent & 0xFFFF0000 >> 12) | (tileEvent & 0x00000F00 >> 8));
@@ -339,7 +339,7 @@ void Jazz2Level::loadEvents(Jazz2FormatDataBlock& block, bool strictParser) {
                 Jazz2TileEvent event;
                 qint32 eventData = block.readUInt();
                 event.eventType = (eventData & 0x000000FF);
-                event.difficulty = ((eventData & 0x00000300) >> 8) % 4;
+                event.difficulty = (Jazz2EventDifficulty)((eventData & 0x00000300) >> 8);
                 event.illuminate = ((eventData & 0x00000400) >> 10 == 1);
                 event.params = ((eventData & 0xFFFFF000) >> 12);
                 events << event;
@@ -531,7 +531,12 @@ PCLevelEventConversionStatistics Jazz2Level::writePCEvents(const QString& filena
         for (int x = 0; x < width; ++x) {
             auto& event = events.at(y * width + x);
 
-            quint8 flags = event.illuminate + (event.difficulty * 2);
+            quint8 flags = 
+                 ((int) event.illuminate                                ) + // Illuminated
+                 ((int)(event.difficulty != DIFFICULTY_HARD       ) << 1) + // Difficulty: Easy
+                 ((int)(event.difficulty == DIFFICULTY_ALL        ) << 2) + // Difficulty: Normal
+                 ((int)(event.difficulty != DIFFICULTY_EASY       ) << 3) + // Difficulty: Hard
+                 ((int)(event.difficulty == DIFFICULTY_MULTIPLAYER) << 4);  // Multiplayer Only
             auto converted = EventConverter::convert(event.eventType, event.params);
 
             if (event.eventType != JJ2_EMPTY) {

@@ -28,7 +28,7 @@ void PCLevelConverter::printDetailedEventStats(const PCLevelConversionStatistics
                   << ", " << QString::number(e.y).rightJustified(3).toStdString() << ")  "
                   << "JJ2:   0x" << QString::number((quint8)e.originalEventType, 16).rightJustified(2, '0').toStdString()
                   << " / " << e.originalEventName.leftJustified(32, ' ', true).toStdString()
-                  << "\n  " << diff[e.difficulty].toStdString() << "  " << (e.illuminate ? "IL" : "  ") << "  "
+                  << "\n  " << diff[(int)e.difficulty].toStdString() << "  " << (e.illuminate ? "IL" : "  ") << "  "
                   << "PC:  0x" << QString::number((quint16)e.eventType, 16).rightJustified(4, '0').toStdString()
                   << " / " << e.eventName.leftJustified(32, ' ', true).toStdString()
                   << "  ";

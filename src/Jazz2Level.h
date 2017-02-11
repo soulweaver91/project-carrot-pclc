@@ -11,6 +11,18 @@
 #include "Jazz2FormatDataBlock.h"
 #include "EventConverter.h"
 
+enum Jazz2LevelVersion {
+    BASE_GAME,
+    TSF
+};
+
+enum Jazz2EventDifficulty {
+    DIFFICULTY_ALL = 0,
+    DIFFICULTY_EASY = 1,
+    DIFFICULTY_HARD = 2,
+    DIFFICULTY_MULTIPLAYER = 3
+};
+
 struct Jazz2Layer {
     quint32 flags;              // all except Parallax Stars supported
     quint8 type;                // ignored
@@ -32,16 +44,16 @@ struct Jazz2Layer {
 };
 
 struct Jazz2TileEvent {
-    quint8 eventType;           // subset of events supported
-    quint8 difficulty;          // not yet supported
-    bool illuminate;            // not yet supported
-    quint32 params;             // supported to some degree
+    quint8 eventType;                 // subset of events supported
+    Jazz2EventDifficulty difficulty;  // supported
+    bool illuminate;                  // not yet supported
+    quint32 params;                   // support varies by event
 };
 
 struct Jazz2TileProperty {
     Jazz2TileEvent event;       // supported
     quint8 flipped;             // supported
-    quint8 type;                // not yet supported
+    quint8 type;                // translucent: supported, caption: won't be supported
 };
 
 struct Jazz2AniTile {
@@ -67,7 +79,7 @@ struct PCLevelEventConversionStatistics {
         PCEvent eventType;
         QString eventName;
         ParamArray params;
-        quint8 difficulty;
+        Jazz2EventDifficulty difficulty;
         bool illuminate;
     };
 
@@ -82,11 +94,6 @@ struct PCLevelEventConversionStatistics {
 
 struct PCLevelConversionStatistics {
     PCLevelEventConversionStatistics events;
-};
-
-enum Jazz2LevelVersion {
-    BASE_GAME,
-    TSF
 };
 
 class Jazz2Level {
